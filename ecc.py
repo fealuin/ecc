@@ -1,15 +1,24 @@
 import math
+## M Es mensaje en Claro
+## P Es modulo
+## n Clave Privada
+## p,q puntos cualquiera
+## 
+
+
+
 def validaCoeficientes(a,b):
 	if 4*pow(a,3)+27*pow(b,2)==0:
 		return False
 	return True
 
 
-def sumaPuntos(p,q,P,a): #Suma puntos de la curva eliptica
+def sumaPuntos(p,q,P,a): #Suma puntos p y q de la curva eliptica
 
 	if(p==q):
 		for i in range (1,2000):
 			x=(P*i+1.0)/(2*p[1])
+			print p[0]
 			if x-int(x) == 0:
 				s=(3*pow(p[0],2)+a)*int(x)%P
 				break
@@ -36,12 +45,12 @@ def sumaPuntos(p,q,P,a): #Suma puntos de la curva eliptica
 def restaPuntos(p,q,P,a): #Suma el inverso aditivo de q a p
 	return sumaPuntos(p,tuple((q[0],-q[1])),P,a)
 
-def multiplicaPunto(n,p,P,a): #multiplica puntos
-	for i in range(n):
+def multiplicaPunto(n,p,P,a): #multiplica, sumando el punto p n veces
+	for i in range(n-1):
 		if i==0:
-			a=p
-		a=sumaPuntos(a,p,P,a)
-	return a
+			aux=p
+		aux=sumaPuntos(aux,p,P,a)
+	return aux
 
 	#if n==1:
 	#	return p
@@ -62,6 +71,7 @@ def puntosEnCurva(P,a,b): #busca los puntos y los deja en una lista
 				conj.append((i,j))
 				print ((i,j))
 	return conj
+
 def esPrimo(n):
 	if n%2==0 and n>2:
 		return False
@@ -76,11 +86,19 @@ def validaGenerador(g,P,a,b):
 			i=i+1
 			if punto[0]==g[0]: 
 				if esPrimo(i):
-					print i
-					return True
-	return False
+					return i
+	return 0
 
-print validaGenerador((6, 9),23,3,8)
+
+
+def encriptar(M,Q,g,P,a,b,k):
+	return [multiplicaPunto(k,g,P,a),sumaPuntos(M,multiplicaPunto(k,Q,P,a),P,a)]
+
+def desencriptar(C,n,P,a,b):
+	return restaPuntos(C[1],multiplicaPunto(n,C[0],P,a),P,a)
+
+#print desencriptar(encriptar((10,9),(7,2),(2,7),11,1,6,3),7,11,1,6)
+#print validaGenerador((6, 9),23,3,8)
 #print puntoEnCurva((1,22),23,3,8)
 #puntosEnCurva(23,3,8)
 #print sumaPuntos((2,7),(2,7),11,1)
