@@ -15,31 +15,34 @@ def validaCoeficientes(a,b):
 
 def sumaPuntos(p,q,P,a): #Suma puntos p y q de la curva eliptica
 
-	if(p==q):
-		for i in range (1,2000):
+	if(p==q and not p[1]==0):
+		i=1
+		while True:
 			x=(P*i+1.0)/(2*p[1])
-			print p[0]
 			if x-int(x) == 0:
 				s=(3*pow(p[0],2)+a)*int(x)%P
 				break
+			i=i+1
 		rx=pow(s,2)-2*p[0]
 		ry=s*(p[0]-rx)-p[1]
-		print "%s + %s = %s"%(str(p),str(q),tuple((rx%P,ry%P)))
+		#print "%s + %s = %s"%(str(p),str(q),tuple((rx%P,ry%P)))
 		return tuple((rx%P,ry%P))
 	else:
-		if(p[0]==q[0]):
-			print "IGUALESS %s + %s = %s"%(str(p),str(q),str(q))
+		if(p[0]==q[0] or (p[1]==0 and p==q)):
+			#print "IGUALESS %s + %s = %s"%(str(p),str(q),str(q))
 			return q
 		#print "sumando puntos distintos %s %s"%(str(p),str(q))
-		for i in range (1,1000):
+		i=1
+		while True:
 			x=(P*i+1.0)/(p[0]-q[0])
 			#print x
 			if x-int(x) == 0:
 				s=(p[1]-q[1])*int(x)%P
 				break
+			i=i+1
 		rx=pow(s,2)-p[0]-q[0]
 		ry=s*(p[0]-rx)-p[1]
-		print "%s + %s = %s"%(str(p),str(q),tuple((rx%P,ry%P)))
+		#print "%s + %s = %s"%(str(p),str(q),tuple((rx%P,ry%P)))
 		return tuple((rx%P,ry%P))
 
 def restaPuntos(p,q,P,a): #Suma el inverso aditivo de q a p
@@ -69,7 +72,7 @@ def puntosEnCurva(P,a,b): #busca los puntos y los deja en una lista
 		for j in range(P):
 			if(puntoEnCurva((i,j),P,a,b)):
 				conj.append((i,j))
-				print ((i,j))
+				#print ((i,j)),
 	return conj
 
 def esPrimo(n):
@@ -86,10 +89,19 @@ def validaGenerador(g,P,a,b):
 			i=i+1
 			if punto[0]==g[0]: 
 				if esPrimo(i):
+					#print "el punto %s es generador de orden %d"%(str(g),i)
 					return i
+	#print "el punto %s no es generador",str(g)
 	return 0
 
-
+def puntosGeneradores(P,a,b):
+	lista=[]
+	for punto in puntosEnCurva(P,a,b):
+		if validaGenerador(punto,P,a,b)>0:
+			lista.append(punto)
+			print str(punto),validaGenerador(punto,P,a,b)
+	return lista
+			
 
 def encriptar(M,Q,g,P,a,b,k):
 	return [multiplicaPunto(k,g,P,a),sumaPuntos(M,multiplicaPunto(k,Q,P,a),P,a)]
@@ -100,7 +112,8 @@ def desencriptar(C,n,P,a,b):
 #print desencriptar(encriptar((10,9),(7,2),(2,7),11,1,6,3),7,11,1,6)
 #print validaGenerador((6, 9),23,3,8)
 #print puntoEnCurva((1,22),23,3,8)
-#puntosEnCurva(23,3,8)
+#print puntosEnCurva(23,3,8)
+#puntosGeneradores(23,3,8)
 #print sumaPuntos((2,7),(2,7),11,1)
 #print multiplicaPunto(7,(2,7),11,1)
 #print sumaPuntos((10,-2),(8,3),11)
