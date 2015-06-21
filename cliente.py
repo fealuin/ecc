@@ -18,7 +18,7 @@ while True:
         b=int(raw_input("Ingrese coeficiente b:"))
         if not ecc.validaCoeficientes(a,b):
             print "Coeficientes a y b invalidos"
-        elif P < 3:
+        elif P < 4:
             print "El Modulo debe ser mayor que 3"
         elif not ecc.esPrimo(P):
             print "El Modulo debe ser primo"
@@ -45,7 +45,7 @@ while True:
 while True:
     try:
         n=int(raw_input("Ingrese su Clave Privada:"))
-        if(n>orden and n<2):
+        if(n>orden or n<2):
             print("La clave debe ser mayor que 1 y menor que %d"%orden)
         else:
             break
@@ -56,29 +56,30 @@ clavePublica=ecc.multiplicaPunto(n,G,P,a)
 print "Su clave publica es: %s"%str(clavePublica)
 print "Esperando a Servidor"
 sock.sendall('10')
-
 while True:
     if sock.recv(1024)=='10':
         break
 print "Intercambiando Clave Publica"
 
-sock.sendall(str(clavePublica))
+sock.sendall(str(clavePublica[0])+"|"+str(clavePublica[1]))
 
-clave=tuple(sock.recv(1024))
-
+clave=sock.recv(1024)
+clave=tuple(map(int,clave.split('|')))
 print "Se ha recibido Clave %s"%str(clave)
+claveCompartida=ecc.multiplicaPunto(n,clave,P,a)
+print "La clave compartida es: %s"%str(claveCompartida)
 
 
-while(True):
-    msg=raw_input("Escriba su mensaje:\n")
-    if len(msg)%2: msg=msg+' '
-    if not msg: 
-        break
-    iv=(raw_input("Escriba Vector Inicial:\n")+" "*16)[:16]
-    k=(raw_input("Escriba clave:\n")+" "*16)[:16]
-    log.logreset()
-    sock.sendall(str(len(msg)))
-    cfb.enviocfb(msg,k,iv,sock)
+#while(True):
+#    msg=raw_input("Escriba su mensaje:\n")
+#    if len(msg)%2: msg=msg+' '
+#    if not msg: 
+#        break
+#    iv=(raw_input("Escriba Vector Inicial:\n")+" "*16)[:16]
+#    k=(raw_input("Escriba clave:\n")+" "*16)[:16]
+#    log.logreset()
+#    sock.sendall(str(len(msg)))
+#    cfb.enviocfb(msg,k,iv,sock)
     
 sock.sendall('0')
 print "Saliendo"
